@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
       allowedOrigins: serverActionOrigins(),
     },
   },
-  serverExternalPackages: ["tesseract.js"],
+  serverExternalPackages: ["tesseract.js", "sharp", "heic-convert"],
 };
 
 export default nextConfig;

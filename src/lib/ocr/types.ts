@@ -9,6 +9,7 @@ export type LicenceFields = {
 
 export type LicenceOcrResult = LicenceFields & {
   rawText: string;
+  filledFields: Array<keyof LicenceFields>;
 };
 
 export interface OcrProvider {

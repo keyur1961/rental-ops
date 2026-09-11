@@ -8,17 +8,19 @@
     "start": "node scripts/start.mjs",
     "lint": "eslint",
     "seed": "tsx prisma/seed.ts",
-    "test": "tsx --test src/lib/ocr/parse-au-licence.test.ts src/lib/maintenance.test.ts src/lib/paths.test.ts"
+    "test": "tsx --test src/lib/ocr/parse-au-licence.test.ts src/lib/ocr/preprocess.test.ts src/lib/maintenance.test.ts src/lib/paths.test.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.16.3",
+    "heic-convert": "^2.1.0",
     "next": "16.3.4",
     "prisma": "^6.16.3",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "sharp": "^0.35.4",
     "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
