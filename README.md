@@ -21,7 +21,7 @@ npm test        # licence parser + maintenance flags
 npm run build   # production build
 ```
 
-SQLite lives at `prisma/dev.db`. Photos land in `uploads/rentals/{id}/licence|handover|return|odometer/` (and `uploads/vehicles/{id}/odometer/` when there is no open hire).
+SQLite lives at `prisma/dev.db` (Prisma `DATABASE_URL`, default `file:./dev.db`). Photos land in `uploads/rentals/{id}/licence|handover|return|odometer/` (and `uploads/vehicles/{id}/odometer/` when there is no open hire). On Railway both sit on the `/data` volume — see below.
 
 ## Walkthrough
 
@@ -62,6 +62,27 @@ If kilometres have crossed a service or tyre interval, the car lands on the atte
 ### 6. Board
 
 Home shows cars on rent, cars needing attention, open holds, and hires due back in the next 48 hours.
+
+## Deploy on Railway
+
+Use a single **Web Service** from this GitHub repo plus a **persistent volume**. Do not store the desk database or hire photos on an ephemeral filesystem (including trycloudflare).
+
+1. New project → Deploy from GitHub → this repo (`railway.toml` uses Nixpacks: `npm ci && npm run build`, then `npm start`).
+2. Attach a volume to the service with **mount path `/data`**. Volumes are mounted at runtime only, not during build — that is why `npm start` runs `prisma db push` before `next start`.
+3. Settings → Networking → generate a public domain (`*.up.railway.app`). Custom domains: add the hostname to `SERVER_ACTIONS_ALLOWED_ORIGINS`.
+4. Set the variables below and deploy.
+
+First request against an empty volume seeds the Riverbend demo owner + cars (safe upserts; same as `npm run seed`). Local `npm run dev` is unchanged: SQLite at `prisma/dev.db`, photos in `uploads/`.
+
+| Variable | On Railway | Notes |
+| --- | --- | --- |
+| `OPS_PASSWORD` | recommended | Desk password. Default `rentalops`. |
+| `OPS_SESSION_SECRET` | **set in production** | Signs the session cookie. Do not keep the local default. |
+| `DATA_DIR` | **`/data`** | SQLite defaults to `/data/dev.db` and photos to `/data/uploads`. |
+| `DATABASE_URL` | optional | Prisma URL. Local default `file:./dev.db`. Railway: `file:/data/dev.db` (or omit and set `DATA_DIR`). |
+| `UPLOADS_DIR` | optional | Photo root override. Defaults to `$DATA_DIR/uploads` or local `uploads/`. |
+| `PORT` | set by Railway | Listens on `0.0.0.0` and `PORT` (default 3000). |
+| `SERVER_ACTIONS_ALLOWED_ORIGINS` | optional | Extra Server Action CSRF hosts, comma-separated. `*.trycloudflare.com` and `*.up.railway.app` are already allowed. |
 
 ## Design notes
 

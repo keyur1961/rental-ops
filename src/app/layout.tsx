@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   description: "Brisbane private car hire operations — replace the spreadsheet.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: Readonly<{

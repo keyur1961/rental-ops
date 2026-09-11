@@ -3,21 +3,20 @@ import path from "node:path";
 import { randomBytes } from "node:crypto";
 import type { PhotoCategory } from "@/lib/constants";
 import { fileUrl as publicFileUrl } from "@/lib/files";
-
-export const UPLOAD_ROOT = path.join(process.cwd(), "uploads");
+import { resolveUploadRoot } from "@/lib/paths";
 
 const ALLOWED_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp", "heic", "heif"]);
 
 export function uploadRoot(): string {
-  return UPLOAD_ROOT;
+  return resolveUploadRoot();
 }
 
 export function rentalFolder(rentalId: string, category: PhotoCategory): string {
-  return path.join(UPLOAD_ROOT, "rentals", rentalId, category);
+  return path.join(uploadRoot(), "rentals", rentalId, category);
 }
 
 export function vehicleOdometerFolder(vehicleId: string): string {
-  return path.join(UPLOAD_ROOT, "vehicles", vehicleId, "odometer");
+  return path.join(uploadRoot(), "vehicles", vehicleId, "odometer");
 }
 
 export function extensionFromName(name: string): string {
@@ -34,7 +33,7 @@ export function safeRelativePath(relativePath: string): string {
 }
 
 export function absoluteFromRelative(relativePath: string): string {
-  return path.join(UPLOAD_ROOT, safeRelativePath(relativePath));
+  return path.join(uploadRoot(), safeRelativePath(relativePath));
 }
 
 export async function saveBuffer(options: {
@@ -45,7 +44,7 @@ export async function saveBuffer(options: {
   await mkdir(options.directory, { recursive: true });
   const fullPath = path.join(options.directory, options.filename);
   await writeFile(fullPath, options.data);
-  return path.relative(UPLOAD_ROOT, fullPath).split(path.sep).join("/");
+  return path.relative(uploadRoot(), fullPath).split(path.sep).join("/");
 }
 
 export async function saveRentalPhoto(options: {
