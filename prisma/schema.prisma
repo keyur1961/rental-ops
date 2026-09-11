@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model OwnerProfile {
+  id             String   @id @default("default")
+  businessName   String
+  abn            String?
+  address        String
+  phone          String
+  email          String
+  bankNotes      String
+  standardTerms  String
+  holdPeriodDays Int      @default(6)
+  updatedAt      DateTime @updatedAt
+}
+
+model Vehicle {
+  id                String             @id @default(cuid())
+  make              String
+  model             String
+  year              Int
+  rego              String             @unique
+  vin               String?
+  colour            String
+  odometerKm        Int
+  status            String             @default("available")
+  serviceIntervalKm Int                @default(10000)
+  tyreIntervalKm    Int                @default(40000)
+  lastServiceKm     Int                @default(0)
+  lastTyreKm        Int                @default(0)
+  notes             String             @default("")
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  rentals           Rental[]
+  odometerReadings  OdometerReading[]
+  odometerTokens    OdometerToken[]
+}
+
+model Rental {
+  id                  String             @id @default(cuid())
+  vehicleId           String
+  vehicle             Vehicle            @relation(fields: [vehicleId], references: [id])
+  status              String             @default("draft")
+  renterName          String             @default("")
+  renterLicenceNumber String             @default("")
+  renterLicenceExpiry String             @default("")
+  renterAddress       String             @default("")
+  renterDob           String             @default("")
+  renterLicenceClass  String             @default("")
+  renterMobile        String             @default("")
+  plannedStart        DateTime
+  plannedEnd          DateTime
+  handedOverAt        DateTime?
+  returnedAt          DateTime?
+  startOdometerKm     Int?
+  returnOdometerKm    Int?
+  startFuel           String?
+  returnFuel          String?
+  holdUntil           DateTime?
+  holdReleasedAt      DateTime?
+  notes               String             @default("")
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  charges             Charge[]
+  photos              Photo[]
+  odometerReadings    OdometerReading[]
+}
+
+model Charge {
+  id          String   @id @default(cuid())
+  rentalId    String
+  rental      Rental   @relation(fields: [rentalId], references: [id], onDelete: Cascade)
+  description String
+  amountCents Int
+  createdAt   DateTime @default(now())
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  rentalId  String
+  rental    Rental   @relation(fields: [rentalId], references: [id], onDelete: Cascade)
+  category  String
+  slot      String
+  relativePath String
+  createdAt DateTime @default(now())
+
+  @@unique([rentalId, category, slot])
+}
+
+model OdometerReading {
+  id         String   @id @default(cuid())
+  vehicleId  String
+  vehicle    Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  rentalId   String?
+  rental     Rental?  @relation(fields: [rentalId], references: [id])
+  km         Int
+  photoPath  String?
+  source     String
+  createdAt  DateTime @default(now())
+}
+
+model OdometerToken {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  vehicleId String
+  vehicle   Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+}
