@@ -34,7 +34,7 @@ const AU_CLASSES = ["MC", "HC", "HR", "MR", "LR", "RE", "C", "R"];
 
 const DATE_NUMERIC =
   /(\d{1,2})[./\s-](\d{1,2})[./\s-](\d{2,4})/g;
-const DATE_MONTH_NAME = /(\d{1,2})\s+([A-Za-z]{3,9})\.?,?\s+(\d{2,4})/gi;
+const DATE_MONTH_NAME = /(\d{1,2})[\s/.-]+([A-Za-z]{3,9})\.?,?[\s/.-]+(\d{2,4})/gi;
 
 function cleanLine(line: string): string {
   return line.replace(/\s+/g, " ").trim();
@@ -65,7 +65,7 @@ function expandYear(year: string, kind: "dob" | "expiry" | "any"): string {
 
 function normaliseDate(value: string, kind: "dob" | "expiry" | "any" = "any"): string {
   const trimmed = value.replace(/,/g, " ").replace(/\s+/g, " ").trim();
-  const monthName = trimmed.match(/^(\d{1,2})\s+([A-Za-z]{3,9})\.?\s+(\d{2,4})$/);
+  const monthName = trimmed.match(/^(\d{1,2})[\s/.-]+([A-Za-z]{3,9})\.?,?[\s/.-]+(\d{2,4})$/);
   if (monthName) {
     const month = MONTHS[monthName[2].toLowerCase()];
     if (month) {
@@ -167,7 +167,7 @@ function toSortable(auDate: string): string {
 function extractDob(text: string): string | undefined {
   const labelled = matchFirst(text, [
     /(?:date of birth|d\.?o\.?b\.?|born)\s*[:.]?\s*(\d{1,2}[./\s-]\d{1,2}[./\s-]\d{2,4})/i,
-    /(?:date of birth|d\.?o\.?b\.?|born)\s*[:.]?\s*(\d{1,2}\s+[A-Za-z]{3,9}\s+\d{2,4})/i,
+    /(?:date of birth|d\.?o\.?b\.?|born)\s*[:.]?\s*(\d{1,2}[\s/.-]+[A-Za-z]{3,9}\.?,?[\s/.-]+\d{2,4})/i,
   ]);
   if (labelled) return asDate(labelled, "dob");
   const monthName = text.match(/\b(?:date of birth|d\.?o\.?b\.?|born)\s*[:.]?\s*(\d{1,2}\s+[A-Za-z]{3,9}\s+\d{2,4})/i);

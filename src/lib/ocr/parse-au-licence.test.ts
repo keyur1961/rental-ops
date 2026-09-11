@@ -95,6 +95,12 @@ Queensland Government
     assert.equal(parsed.address, undefined);
   });
 
+  it("reads a slashed month-name date of birth", () => {
+    const parsed = parseAuLicence("DOB 19/Jan/1981\nLicence No 098765432");
+    assert.equal(parsed.dob, "19/01/1981");
+    assert.equal(parsed.licenceNumber, "098765432");
+  });
+
   it("recovers fields from noisy phone OCR of a QLD front", () => {
     const text = `
 LICENCE NO. / CRN
