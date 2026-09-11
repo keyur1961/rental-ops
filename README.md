@@ -67,7 +67,7 @@ Home shows cars on rent, cars needing attention, open holds, and hires due back 
 
 Use a single **Web Service** from this GitHub repo plus a **persistent volume**. Do not store the desk database or hire photos on an ephemeral filesystem (including trycloudflare).
 
-1. New project → Deploy from GitHub → this repo (`railway.toml` uses Nixpacks: `npm ci && npm run build`, then `npm start`).
+1. New project → Deploy from GitHub → this repo (`railway.toml` uses Nixpacks: install `npm ci`, build `npm run build`, start `npm start`; Node 20).
 2. Attach a volume to the service with **mount path `/data`**. Volumes are mounted at runtime only, not during build — that is why `npm start` runs `prisma db push` before `next start`.
 3. Settings → Networking → generate a public domain (`*.up.railway.app`). Custom domains: add the hostname to `SERVER_ACTIONS_ALLOWED_ORIGINS`.
 4. Set the variables below and deploy.
