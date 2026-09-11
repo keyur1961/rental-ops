@@ -1,0 +1,14 @@
+# Web Service from GitHub. Attach a volume mounted at /data (dashboard),
+# then set DATA_DIR=/data so SQLite and photo uploads survive redeploys.
+# Volumes are available at runtime only — schema push runs in `npm start`.
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "npm ci && npm run build"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/login"
+healthcheckTimeout = 120
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
