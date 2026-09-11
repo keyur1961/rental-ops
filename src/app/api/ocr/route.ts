@@ -4,6 +4,7 @@ import { SESSION_COOKIE } from "@/lib/constants";
 import { createOcrProvider } from "@/lib/ocr";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   const token = request.headers
@@ -29,6 +30,9 @@ export async function POST(request: Request) {
     return NextResponse.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : "OCR failed.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: message.startsWith("OCR") || message.includes("HEIC") ? message : `OCR failed: ${message}` },
+      { status: 500 },
+    );
   }
 }
