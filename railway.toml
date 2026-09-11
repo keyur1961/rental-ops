@@ -1,10 +1,14 @@
 # Web Service from GitHub. Attach a volume mounted at /data (dashboard),
 # then set DATA_DIR=/data so SQLite and photo uploads survive redeploys.
 # Volumes are available at runtime only — schema push runs in `npm start`.
+# Nixpacks install already runs `npm ci`; build must not re-run it (EBUSY on cache mounts).
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "openssl"]
 
 [build]
 builder = "NIXPACKS"
-buildCommand = "npm ci && npm run build"
+buildCommand = "npm run build"
 
 [deploy]
 startCommand = "npm start"
