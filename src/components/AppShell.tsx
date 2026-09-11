@@ -31,7 +31,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
             <form action={logoutAction}>
-              <button className="btn btn-ghost px-3 py-2 text-sm" type="submit">
+              <button className="btn btn-ghost px-3 py-2 text-sm" type="submit" name="signout">
                 Sign out
               </button>
             </form>

@@ -39,6 +39,14 @@ export function kmUntil(currentKm: number, lastKm: number, intervalKm: number): 
   return lastKm + intervalKm - currentKm;
 }
 
+export function kmUntilLabel(currentKm: number, lastKm: number, intervalKm: number): string {
+  const remaining = kmUntil(currentKm, lastKm, intervalKm);
+  if (remaining >= 0) {
+    return `in ${remaining.toLocaleString("en-AU")} km`;
+  }
+  return `${Math.abs(remaining).toLocaleString("en-AU")} km overdue`;
+}
+
 export function nextStatusAfterOdometer(
   vehicle: MaintenanceVehicle,
   nextKm: number,

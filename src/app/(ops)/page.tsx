@@ -3,7 +3,7 @@ import { RentalBadge, VehicleBadge } from "@/components/StatusBadge";
 import { formatAuDateTime } from "@/lib/dates";
 import { prisma } from "@/lib/db";
 import { asRentalStatus, asVehicleStatus } from "@/lib/guards";
-import { dueItems, dueLabels, kmUntil } from "@/lib/maintenance";
+import { dueItems, dueLabels, kmUntilLabel } from "@/lib/maintenance";
 import { formatAud } from "@/lib/money";
 
 export default async function DashboardPage() {
@@ -81,8 +81,8 @@ export default async function DashboardPage() {
                 <VehicleBadge status={asVehicleStatus(vehicle.status)} />
               </div>
               <p className="mt-2 text-sm text-ink-soft">
-                {vehicle.odometerKm.toLocaleString("en-AU")} km · service in{" "}
-                {kmUntil(vehicle.odometerKm, vehicle.lastServiceKm, vehicle.serviceIntervalKm).toLocaleString("en-AU")} km
+                {vehicle.odometerKm.toLocaleString("en-AU")} km · service{" "}
+                {kmUntilLabel(vehicle.odometerKm, vehicle.lastServiceKm, vehicle.serviceIntervalKm)}
               </p>
             </Link>
           );

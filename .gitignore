@@ -45,6 +45,9 @@ yarn-error.log*
 /uploads/**
 !/uploads/.gitkeep
 
+# tesseract language packs downloaded at runtime
+*.traineddata
+
 # vercel
 .vercel
 

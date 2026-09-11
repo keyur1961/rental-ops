@@ -4,12 +4,12 @@ import { seedIfEmpty } from "@/lib/seed";
 import "./globals.css";
 
 const display = Fraunces({
-  variable: "--font-display",
+  variable: "--font-fraunces",
   subsets: ["latin"],
 });
 
 const body = Source_Sans_3({
-  variable: "--font-body",
+  variable: "--font-source-sans",
   subsets: ["latin"],
 });
 
@@ -25,7 +25,10 @@ export default async function RootLayout({
 }>) {
   await seedIfEmpty();
   return (
-    <html lang="en-AU" className={`${display.variable} ${body.variable} h-full antialiased`}>
+    <html
+      lang="en-AU"
+      className={`${display.variable} ${body.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

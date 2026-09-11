@@ -9,7 +9,7 @@ import { RentalBadge, VehicleBadge } from "@/components/StatusBadge";
 import { formatAuDateTime } from "@/lib/dates";
 import { prisma } from "@/lib/db";
 import { asRentalStatus, asVehicleStatus } from "@/lib/guards";
-import { dueItems, dueLabels, kmUntil } from "@/lib/maintenance";
+import { dueItems, dueLabels, kmUntilLabel } from "@/lib/maintenance";
 
 export default async function VehicleDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -52,8 +52,8 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
         <div className="card p-4">
           <p className="font-semibold">{flags.join(" · ")}</p>
           <p className="mt-1 text-sm text-ink-soft">
-            Service in {kmUntil(vehicle.odometerKm, vehicle.lastServiceKm, vehicle.serviceIntervalKm).toLocaleString("en-AU")} km ·
-            tyres in {kmUntil(vehicle.odometerKm, vehicle.lastTyreKm, vehicle.tyreIntervalKm).toLocaleString("en-AU")} km
+            Service {kmUntilLabel(vehicle.odometerKm, vehicle.lastServiceKm, vehicle.serviceIntervalKm)} ·
+            tyres {kmUntilLabel(vehicle.odometerKm, vehicle.lastTyreKm, vehicle.tyreIntervalKm)}
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <form action={markServiceDone}>

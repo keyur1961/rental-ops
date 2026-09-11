@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   dueItems,
+  kmUntilLabel,
   nextStatusAfterOdometer,
   nextStatusAfterReturn,
 } from "./maintenance";
@@ -34,5 +35,10 @@ describe("maintenance flags", () => {
       nextStatusAfterReturn({ ...base, lastServiceKm: 40000, lastTyreKm: 20000 }),
       "available",
     );
+  });
+
+  it("labels overdue kilometres in plain English", () => {
+    assert.equal(kmUntilLabel(41000, 30000, 10000), "1,000 km overdue");
+    assert.equal(kmUntilLabel(35000, 30000, 10000), "in 5,000 km");
   });
 });

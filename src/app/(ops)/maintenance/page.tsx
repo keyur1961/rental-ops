@@ -4,7 +4,7 @@ import { TokenLinkButton } from "@/components/TokenLinkButton";
 import { VehicleBadge } from "@/components/StatusBadge";
 import { prisma } from "@/lib/db";
 import { asVehicleStatus } from "@/lib/guards";
-import { dueItems, dueLabels, kmUntil } from "@/lib/maintenance";
+import { dueItems, dueLabels, kmUntilLabel } from "@/lib/maintenance";
 
 export default async function MaintenancePage() {
   const vehicles = await prisma.vehicle.findMany({ orderBy: { rego: "asc" } });
@@ -56,7 +56,7 @@ export default async function MaintenancePage() {
                     {vehicle.rego} · {vehicle.odometerKm.toLocaleString("en-AU")} km
                   </p>
                   <p className="text-sm text-ink-soft">
-                    Service in {kmUntil(vehicle.odometerKm, vehicle.lastServiceKm, vehicle.serviceIntervalKm).toLocaleString("en-AU")} km
+                    Service {kmUntilLabel(vehicle.odometerKm, vehicle.lastServiceKm, vehicle.serviceIntervalKm)}
                   </p>
                 </div>
                 <VehicleBadge status={asVehicleStatus(vehicle.status)} />

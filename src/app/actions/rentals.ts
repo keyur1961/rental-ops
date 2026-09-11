@@ -124,36 +124,41 @@ export async function handOverRental(
 
   const startOdometerKm = Number.parseInt(String(formData.get("startOdometerKm") ?? ""), 10);
   const startFuel = String(formData.get("startFuel") ?? "").trim();
-  if (!Number.isFinite(startOdometerKm) || startOdometerKm < 0) {
-    return { error: "Enter the handover odometer." };
+  if (!Number.isFinite(startOdometerKm) || startOdometerKm < 0 || startOdometerKm > 2_000_000) {
+    return { error: "Enter a sensible handover odometer (km)." };
   }
   if (!startFuel) {
     return { error: "Enter the handover fuel level." };
   }
 
-  await prisma.$transaction([
-    prisma.rental.update({
-      where: { id },
-      data: {
-        status: "on_rent",
-        handedOverAt: new Date(),
-        startOdometerKm,
-        startFuel,
-      },
-    }),
-    prisma.vehicle.update({
-      where: { id: rental.vehicleId },
-      data: { status: "on_rent", odometerKm: startOdometerKm },
-    }),
-    prisma.odometerReading.create({
-      data: {
-        vehicleId: rental.vehicleId,
-        rentalId: rental.id,
-        km: startOdometerKm,
-        source: "rental_start",
-      },
-    }),
-  ]);
+  try {
+    await prisma.$transaction([
+      prisma.rental.update({
+        where: { id },
+        data: {
+          status: "on_rent",
+          handedOverAt: new Date(),
+          startOdometerKm,
+          startFuel,
+        },
+      }),
+      prisma.vehicle.update({
+        where: { id: rental.vehicleId },
+        data: { status: "on_rent", odometerKm: startOdometerKm },
+      }),
+      prisma.odometerReading.create({
+        data: {
+          vehicleId: rental.vehicleId,
+          rentalId: rental.id,
+          km: startOdometerKm,
+          source: "rental_start",
+        },
+      }),
+    ]);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Could not hand over.";
+    return { error: message };
+  }
 
   revalidateRental(id, rental.vehicleId);
   return {};
@@ -182,8 +187,8 @@ export async function returnRental(
 
   const returnOdometerKm = Number.parseInt(String(formData.get("returnOdometerKm") ?? ""), 10);
   const returnFuel = String(formData.get("returnFuel") ?? "").trim();
-  if (!Number.isFinite(returnOdometerKm)) {
-    return { error: "Enter the return odometer." };
+  if (!Number.isFinite(returnOdometerKm) || returnOdometerKm < 0 || returnOdometerKm > 2_000_000) {
+    return { error: "Enter a sensible return odometer (km)." };
   }
   if (rental.startOdometerKm != null && returnOdometerKm < rental.startOdometerKm) {
     return { error: "Return odometer cannot be below the handover reading." };
@@ -201,34 +206,39 @@ export async function returnRental(
     odometerKm: returnOdometerKm,
   };
 
-  await prisma.$transaction([
-    prisma.rental.update({
-      where: { id },
-      data: {
-        status: "on_hold",
-        returnedAt: now,
-        returnOdometerKm,
-        returnFuel,
-        holdUntil: addDays(now, period),
-        notes: String(formData.get("notes") ?? rental.notes).trim(),
-      },
-    }),
-    prisma.vehicle.update({
-      where: { id: rental.vehicleId },
-      data: {
-        odometerKm: returnOdometerKm,
-        status: nextStatusAfterReturn(vehicleAfterReturn),
-      },
-    }),
-    prisma.odometerReading.create({
-      data: {
-        vehicleId: rental.vehicleId,
-        rentalId: rental.id,
-        km: returnOdometerKm,
-        source: "rental_return",
-      },
-    }),
-  ]);
+  try {
+    await prisma.$transaction([
+      prisma.rental.update({
+        where: { id },
+        data: {
+          status: "on_hold",
+          returnedAt: now,
+          returnOdometerKm,
+          returnFuel,
+          holdUntil: addDays(now, period),
+          notes: String(formData.get("notes") ?? rental.notes).trim(),
+        },
+      }),
+      prisma.vehicle.update({
+        where: { id: rental.vehicleId },
+        data: {
+          odometerKm: returnOdometerKm,
+          status: nextStatusAfterReturn(vehicleAfterReturn),
+        },
+      }),
+      prisma.odometerReading.create({
+        data: {
+          vehicleId: rental.vehicleId,
+          rentalId: rental.id,
+          km: returnOdometerKm,
+          source: "rental_return",
+        },
+      }),
+    ]);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Could not take the return.";
+    return { error: message };
+  }
 
   revalidateRental(id, rental.vehicleId);
   redirect(`/rentals/${id}`);
